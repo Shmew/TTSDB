@@ -2,4 +2,10 @@
     Discord.Net
     FSharp.Control.AsyncSeq
     FSharp.Core
+    FSharp.Json
+    Microsoft.CognitiveServices.Speech
     TaskBuilder.fs
+    
+    // Native libraries
+    OpusDotNet.opus.win-x64
+    libsodium

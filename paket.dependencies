@@ -11,7 +11,13 @@ group DiscordBot
 	nuget Fake.IO.FileSystem ~> 5
     nuget FSharp.Control.AsyncSeq ~> 3
     nuget FSharp.Core ~> 5
+    nuget FSharp.Json ~> 0
+    nuget Microsoft.CognitiveServices.Speech ~> 1
     nuget TaskBuilder.fs ~> 2
+
+    // Native libraries
+    nuget OpusDotNet.opus.win-x64 ~> 1
+    nuget libsodium ~> 1
 
 group Tooling
     source https://nuget.org/api/v2
