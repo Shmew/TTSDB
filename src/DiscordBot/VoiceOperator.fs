@@ -52,12 +52,17 @@ type VoiceOperator (?subMap: Map<string,string>) =
         new SpeechSynthesizer(speechConfig, null)
 
     let createSSML (user: string) (content: string) =
+        let content =
+            if content.ToLower().StartsWith("http://") || content.ToLower().StartsWith("https://") then
+                "posted a link"
+            else sprintf "says, %s" content
+
         sprintf """
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
     <voice name="en-US-AriaNeural">
         <mstts:express-as style="cheerful">
             <prosody rate="-60%%" pitch="-60%%">
-                %s says, %s
+                %s %s
             </prosody>
         </mstts:express-as>
     </voice>
