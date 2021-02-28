@@ -1,0 +1,3 @@
+group NetCoreApp3
+    BenchmarkDotNet
+    FSharp.Core

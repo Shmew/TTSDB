@@ -1,0 +1,154 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{63297B98-5CED-492C-A5B7-A5B4F73CF142}"
+	ProjectSection(SolutionItems) = preProject
+		Nuget.Config = Nuget.Config
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.github\ISSUE_TEMPLATE\BUG_REPORT.md = .github\ISSUE_TEMPLATE\BUG_REPORT.md
+		dotnet-tools.json = dotnet-tools.json
+		.github\ISSUE_TEMPLATE\FEATURE_REQUEST.md = .github\ISSUE_TEMPLATE\FEATURE_REQUEST.md
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+		README.md = README.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{078A9C52-DDC1-46F4-9235-9E6C89C87AFD}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{7C6D08E7-3EAC-4335-8F4B-252C193C27C9}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		build.cmd = build.cmd
+		build.fsx = build.fsx
+		build.sh = build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{55637037-300B-4FA5-8D14-B2CECCCD4B0D}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "tools", "tools\tools.fsproj", "{E03A3045-EEAB-4616-B0D8-A50A1B75F72B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "web", "web", "{7F29BFE8-02B3-4763-838C-3D8228334B4B}"
+	ProjectSection(SolutionItems) = preProject
+		.yarnrc = .yarnrc
+		package.json = package.json
+		publish.js = publish.js
+		startDemoServer.js = startDemoServer.js
+		webpack.config.js = webpack.config.js
+		yarn.lock = yarn.lock
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}"
+	ProjectSection(SolutionItems) = preProject
+		docs\authorization.md = docs\authorization.md
+		docs\contributing.md = docs\contributing.md
+		docs\dotnet-client.md = docs\dotnet-client.md
+		docs\index.html = docs\index.html
+		docs\installation.md = docs\installation.md
+		docs\integration-testing.md = docs\integration-testing.md
+		docs\README.md = docs\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "styles", "styles", "{80A18350-F484-458A-BAC0-64EE73830C5F}"
+	ProjectSection(SolutionItems) = preProject
+		docs\styles\website.css = docs\styles\website.css
+	EndProjectSection
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.SignalR.Tests", "tests\Fable.SignalR.Tests\Fable.SignalR.Tests.fsproj", "{20AEA7CD-4388-4F1B-ADA5-B547CE69709A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "signalr-client", "signalr-client", "{C6935C85-DA7D-47B2-934B-2E90568EB4EC}"
+	ProjectSection(SolutionItems) = preProject
+		docs\signalr-client\api.md = docs\signalr-client\api.md
+		docs\signalr-client\connecting.md = docs\signalr-client\connecting.md
+		docs\signalr-client\messages.md = docs\signalr-client\messages.md
+		docs\signalr-client\README.md = docs\signalr-client\README.md
+		docs\signalr-client\streaming-client.md = docs\signalr-client\streaming-client.md
+		docs\signalr-client\streaming-server.md = docs\signalr-client\streaming-server.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "signalr-server", "signalr-server", "{5336DEEE-6183-44BE-9A9F-DAF2F85C9465}"
+	ProjectSection(SolutionItems) = preProject
+		docs\signalr-server\api.md = docs\signalr-server\api.md
+		docs\signalr-server\aspnetcore.md = docs\signalr-server\aspnetcore.md
+		docs\signalr-server\dependency-injection.md = docs\signalr-server\dependency-injection.md
+		docs\signalr-server\external-calls.md = docs\signalr-server\external-calls.md
+		docs\signalr-server\push-streaming.md = docs\signalr-server\push-streaming.md
+		docs\signalr-server\README.md = docs\signalr-server\README.md
+		docs\signalr-server\saturn.md = docs\signalr-server\saturn.md
+	EndProjectSection
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.SignalR.TestServer", "tests\Fable.SignalR.TestServer\Fable.SignalR.TestServer.fsproj", "{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.SignalR.TestShared", "tests\Fable.SignalR.TestShared\Fable.SignalR.TestShared.fsproj", "{BE9FFEDE-5036-46EA-A4EA-345476C2F678}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Bench", "tests\Bench\Bench.fsproj", "{DCCCDD76-0140-4882-BB1E-96EB427720ED}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Fable.SignalR.DotNet.Tests", "tests\Fable.SignalR.DotNet.Tests\Fable.SignalR.DotNet.Tests.fsproj", "{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DiscordBot", "src\DiscordBot\DiscordBot.fsproj", "{31B63C15-E766-438E-9745-E0BB298E0EDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20AEA7CD-4388-4F1B-ADA5-B547CE69709A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20AEA7CD-4388-4F1B-ADA5-B547CE69709A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20AEA7CD-4388-4F1B-ADA5-B547CE69709A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20AEA7CD-4388-4F1B-ADA5-B547CE69709A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE9FFEDE-5036-46EA-A4EA-345476C2F678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE9FFEDE-5036-46EA-A4EA-345476C2F678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE9FFEDE-5036-46EA-A4EA-345476C2F678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE9FFEDE-5036-46EA-A4EA-345476C2F678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCCCDD76-0140-4882-BB1E-96EB427720ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCCCDD76-0140-4882-BB1E-96EB427720ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCCCDD76-0140-4882-BB1E-96EB427720ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCCCDD76-0140-4882-BB1E-96EB427720ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31B63C15-E766-438E-9745-E0BB298E0EDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31B63C15-E766-438E-9745-E0BB298E0EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31B63C15-E766-438E-9745-E0BB298E0EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31B63C15-E766-438E-9745-E0BB298E0EDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E03A3045-EEAB-4616-B0D8-A50A1B75F72B} = {55637037-300B-4FA5-8D14-B2CECCCD4B0D}
+		{80A18350-F484-458A-BAC0-64EE73830C5F} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{20AEA7CD-4388-4F1B-ADA5-B547CE69709A} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+		{C6935C85-DA7D-47B2-934B-2E90568EB4EC} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{5336DEEE-6183-44BE-9A9F-DAF2F85C9465} = {D05F59F8-14B6-44AB-8FE6-493EE0CA4A75}
+		{6DCEC050-2B9B-4DF7-AE21-D554965EF5A1} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+		{BE9FFEDE-5036-46EA-A4EA-345476C2F678} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+		{DCCCDD76-0140-4882-BB1E-96EB427720ED} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+		{F42ADD8F-C6F1-4D82-A08B-8454ABDC3010} = {27F9F1A6-C6B4-4539-B013-8549B4A6E1B5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {96DAE6A9-B1CC-4FF7-B08C-D5FBFD55B385}
+	EndGlobalSection
+EndGlobal

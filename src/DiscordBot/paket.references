@@ -1,0 +1,5 @@
+﻿group DiscordBot
+    Discord.Net
+    FSharp.Control.AsyncSeq
+    FSharp.Core
+    TaskBuilder.fs

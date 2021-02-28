@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Components.fs" />
+    <Compile Include="SignalR.Elmish.test.fs" />
+    <Compile Include="SignalR.Feliz.test.fs" />
+    <Compile Include="SignalR.test.fs" />
+    <None Include="paket.references" />
+    <None Include="splitter.config.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Fable.SignalR.Elmish\Fable.SignalR.Elmish.fsproj" />
+    <ProjectReference Include="..\..\src\Fable.SignalR.Feliz\Fable.SignalR.Feliz.fsproj" />
+    <ProjectReference Include="..\..\src\Fable.SignalR\Fable.SignalR.fsproj" />
+    <ProjectReference Include="..\Fable.SignalR.TestShared\Fable.SignalR.TestShared.fsproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

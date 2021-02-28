@@ -1,0 +1,42 @@
+version 5.253.0
+
+group DiscordBot
+    source https://nuget.org/api/v2
+    source https://api.nuget.org/v3/index.json
+    
+    nuget BenchmarkDotNet ~> 0
+    nuget Discord.Net ~> 2
+    nuget Expecto ~> 9
+    nuget Expecto.FsCheck ~> 9
+	nuget Fake.IO.FileSystem ~> 5
+    nuget FSharp.Control.AsyncSeq ~> 3
+    nuget FSharp.Core ~> 5
+    nuget TaskBuilder.fs ~> 2
+
+group Tooling
+    source https://nuget.org/api/v2
+    source https://api.nuget.org/v3/index.json
+
+	nuget Fake.IO.FileSystem ~> 5
+    nuget FSharp.Core >= 4.7.2 lowest_matching: true
+    nuget FSharp.Json ~> 0
+	nuget FSharpLint.Core ~> 0
+    nuget Yarnpkg.Yarn ~> 1
+
+group FakeBuild
+	source https://api.nuget.org/v3/index.json
+
+	nuget Fake.Core.Target ~> 5
+	nuget Fake.Core.ReleaseNotes ~> 5
+	nuget Fake.DotNet.AssemblyInfoFile ~> 5
+	nuget Fake.DotNet.Cli ~> 5
+	nuget Fake.DotNet.MSBuild ~> 5
+	nuget Fake.DotNet.Paket ~> 5
+	nuget Fake.IO.FileSystem ~> 5
+	nuget Fake.JavaScript.Npm ~> 5
+    nuget Fake.JavaScript.Yarn ~> 5
+	nuget Fake.Tools.Git ~> 5
+    nuget FSharp.Core ~> 4.7
+    nuget FSharp.Json ~> 0
+	nuget FSharpLint.Core ~> 0
+    nuget NuGet.Packaging 5.6
