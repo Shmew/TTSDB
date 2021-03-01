@@ -36,11 +36,15 @@ type VoiceInstance =
             return! this.VoiceChannel.DisconnectAsync() 
         }
         |> Async.AwaitTask
+        |> Async.map (fun res ->
+            printfn "Disconnected from channel"
+            res
+        )
 
     static member DisposeAsync (voiceInstance: VoiceInstance) =
         voiceInstance.DisposeAsync()
 
-type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
+type VoiceOperator (guildManager: GuildManager, ?settings: Settings) as self =
     let cts = new Threading.CancellationTokenSource()
 
     let nameManager = NameManager(guildManager, ?settings = settings)
@@ -175,7 +179,7 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
                                 |> Map.toList
                                 |> List.map snd
                                 |> AsyncSeq.ofSeq
-                                |> AsyncSeq.iterAsyncParallelThrottled 5 VoiceInstance.DisposeAsync
+                                |> AsyncSeq.iterAsyncParallel VoiceInstance.DisposeAsync
 
                             replyChannel.Reply()
 
@@ -191,7 +195,7 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
                             do!
                                 staleChannels
                                 |> AsyncSeq.ofSeq
-                                |> AsyncSeq.iterAsyncParallelThrottled 5 (fun (_, voiceInstance) ->
+                                |> AsyncSeq.iterAsyncParallel (fun (_, voiceInstance) ->
                                     voiceInstance.DisposeAsync()
                                 )
                         
@@ -200,6 +204,14 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
 
                 loop Map.empty
             ), cts.Token)
+
+    let dispose () =
+        mailbox.PostAndAsyncReply VoiceOperator.Msg.Dispose
+        |> Async.RunSynchronously
+        
+        synthesizer.Dispose()
+        cts.Cancel()
+        cts.Dispose()
 
     do
         AsyncSeq.intervalMs 30000
@@ -220,11 +232,12 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
             return
                 VoiceOperator.Msg.SpeakIn(channel, msg, isOwnerMsg)
                 |> mailbox.Post
-        } :> Task
-        
+        } :> Task        
+
     interface IDisposable with
         member _.Dispose () =
-            mailbox.PostAndAsyncReply VoiceOperator.Msg.Dispose
-            |> Async.RunSynchronously
+            dispose()
             
-            cts.Dispose()
+            System.GC.SuppressFinalize(self)
+    
+    override _.Finalize () = dispose()

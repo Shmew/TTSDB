@@ -1,3 +1,6 @@
+### 0.3.2 - Sunday, February 28th, 2021
+* Improve resource disposal when exceptions are encountered
+
 ### 0.3.1 - Sunday, February 28th, 2021
 * Fix simultaneous talking crashing the bot
 * Fix messages with mentions not being spoken
