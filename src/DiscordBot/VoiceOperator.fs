@@ -36,10 +36,6 @@ type VoiceInstance =
             return! this.VoiceChannel.DisconnectAsync() 
         }
         |> Async.AwaitTask
-        |> Async.map (fun res ->
-            printfn "Disconnected from channel"
-            res
-        )
 
     static member DisposeAsync (voiceInstance: VoiceInstance) =
         voiceInstance.DisposeAsync()
@@ -111,9 +107,6 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) as self =
 
             return!
                 sprintf "%s %s" author content
-                |> fun res ->
-                    printfn "Saying: %s" res
-                    res
                 |> createSSML
         }
 
