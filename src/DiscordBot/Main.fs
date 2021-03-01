@@ -33,7 +33,9 @@ module Main =
             do! client.StartAsync()
             
             let guildManager = GuildManager(client, settings.GuildId)
-            use voiceOperator = new VoiceOperator(Settings.buildSubMap settings.UserSubstitutions)
+            use voiceOperator = new VoiceOperator(Settings.buildSubMap settings.UserSubstitutions, settings.Voice)
+
+            client.add_Ready(Func<Task>(fun () -> client.SetGameAsync("with kittens", ``type`` = ActivityType.Playing)))
 
             client.add_MessageReceived(Func<SocketMessage,Task>(fun msg ->
                 match msg with

@@ -6,5 +6,12 @@
       "Name": "",
       "Replacement": ""
     }
-  ]
+  ],
+  "Voice": {
+    "Pitch": -60,
+    "Rate": -60,
+    "Style": "cheerful",
+    "Voice": "en-US-AriaNeural",
+    "Volume": 100
+  }
 }

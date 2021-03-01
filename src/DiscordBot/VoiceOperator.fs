@@ -37,10 +37,19 @@ type VoiceInstance =
     static member DisposeAsync (voiceInstance: VoiceInstance) =
         voiceInstance.DisposeAsync()
 
-type VoiceOperator (?subMap: Map<string,string>) =
+type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
     let cts = new Threading.CancellationTokenSource()
 
     let subMap = Option.defaultValue Map.empty subMap
+    
+    let voice =
+        Option.defaultValue 
+            { Pitch = -60
+              Rate = -60
+              Style = "cheerful"
+              Voice = "en-US-AriaNeural"
+              Volume = 100 } 
+            voice
 
     let synthesizer =
         let apiKey = getEnvFromAllOrNone "TTSDB_Azure" |> Option.defaultValue ""
@@ -59,15 +68,30 @@ type VoiceOperator (?subMap: Map<string,string>) =
 
         sprintf """
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
-    <voice name="en-US-AriaNeural">
-        <mstts:express-as style="cheerful">
-            <prosody rate="-60%%" pitch="-60%%">
+    <voice name="%s">
+        <mstts:express-as style="%s">
+            <prosody rate="%i%%" pitch="%i%%">
                 %s %s
             </prosody>
         </mstts:express-as>
     </voice>
 </speak>
-        """ user content
+        """ voice.Voice voice.Style voice.Rate voice.Pitch user content
+
+    let setVolume (volume: int) (audio: byte []) =
+        if volume >= 100 || Array.isEmpty audio || audio.Length % 2 <> 0 then audio
+        else
+            let percVol = (float volume) / 100.
+
+            audio
+            |> Array.chunkBySize 2
+            |> Array.collect (fun arr ->
+                BitConverter.ToInt16(arr, 0)
+                |> float
+                |> fun b -> b * percVol
+                |> int16
+                |> BitConverter.GetBytes
+            )
 
     let speakInChannel (discord: AudioOutStream) (msg: SocketUserMessage) =
         task {
@@ -80,8 +104,8 @@ type VoiceOperator (?subMap: Map<string,string>) =
 
                         createSSML author msg.Content
                         |> synthesizer.SpeakSsmlAsync
-                    
-                    return res.AudioData
+
+                    return res.AudioData |> setVolume voice.Volume
                 }
 
             use audioStream = new MemoryStream(audioRaw)

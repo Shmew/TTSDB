@@ -4,11 +4,7 @@ group DiscordBot
     source https://nuget.org/api/v2
     source https://api.nuget.org/v3/index.json
     
-    nuget BenchmarkDotNet ~> 0
     nuget Discord.Net ~> 2
-    nuget Expecto ~> 9
-    nuget Expecto.FsCheck ~> 9
-	nuget Fake.IO.FileSystem ~> 5
     nuget FSharp.Control.AsyncSeq ~> 3
     nuget FSharp.Core ~> 5
     nuget FSharp.Json ~> 0
