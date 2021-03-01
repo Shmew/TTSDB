@@ -1,3 +1,6 @@
+### 0.3.4 - Monday, March 1st, 2021
+* Fix handling when interacting with multiple channels
+
 ### 0.3.3 - Monday, March 1st, 2021
 * Cleanup debug lines
 

@@ -24,6 +24,8 @@ type VoiceInstance =
       PCMStream: AudioOutStream
       VoiceChannel: SocketVoiceChannel }
 
+    member this.Id = this.VoiceChannel.Id
+
     member this.DisposeAsync () =
         task {
             do! this.AudioClient.StopAsync()
@@ -144,18 +146,20 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) as self =
     let mailbox = 
         MailboxProcessor<VoiceOperator.Msg>.Start (
             (fun inbox ->
-                let rec loop (voiceChannels: Map<uint64,VoiceInstance>) =
+                let rec loop (voiceInstance: VoiceInstance option) =
                     async {
                         let! msg = inbox.Receive()
 
                         match msg with
                         | VoiceOperator.Msg.SpeakIn (channel, msg, isOwnerMsg) ->
-                            match Map.tryFind channel.Id voiceChannels with
-                            | Some voiceInstance ->
+                            match voiceInstance with
+                            | Some voiceInstance when voiceInstance.Id = channel.Id ->
                                 messageQueue.OnNext(voiceInstance.PCMStream, msg, isOwnerMsg)
 
-                                return! loop voiceChannels
-                            | None -> 
+                                return! loop (Some voiceInstance)
+                            | Some voiceInstance ->
+                                do! voiceInstance.DisposeAsync()
+
                                 let! ac = channel.ConnectAsync() |> Async.AwaitTask
                                 
                                 let voiceInstance =
@@ -165,37 +169,43 @@ type VoiceOperator (guildManager: GuildManager, ?settings: Settings) as self =
 
                                 messageQueue.OnNext(voiceInstance.PCMStream, msg, isOwnerMsg)
 
-                                return! loop (voiceChannels |> Map.add channel.Id voiceInstance)
+                                return! loop (Some voiceInstance)
+
+                            | None -> 
+                                let! ac = channel.ConnectAsync() |> Async.AwaitTask
+                                
+                                let voiceInstance =
+                                    { AudioClient = ac
+                                      PCMStream = ac.CreatePCMStream(AudioApplication.Mixed)
+                                      VoiceChannel = channel }
+
+                                messageQueue.OnNext(voiceInstance.PCMStream, msg, isOwnerMsg)
+                                
+                                return! loop (Some voiceInstance)
                         | VoiceOperator.Msg.Dispose replyChannel ->
                             do!
-                                voiceChannels
-                                |> Map.toList
-                                |> List.map snd
-                                |> AsyncSeq.ofSeq
-                                |> AsyncSeq.iterAsyncParallel VoiceInstance.DisposeAsync
-
+                                match voiceInstance with
+                                | Some voiceInstance -> voiceInstance.DisposeAsync()
+                                | None -> Async.lift ()
+                                
                             replyChannel.Reply()
 
                             return ()
                         | VoiceOperator.Msg.LeaveEmptyChannels ->
-                            let staleChannels,voiceChannels =
-                                voiceChannels
-                                |> Map.toList
-                                |> List.partition (fun (_, voiceInstance) ->
-                                    voiceInstance.VoiceChannel.Users |> List.ofSeq |> List.length < 2
-                                )
+                            let! voiceInstance =
+                                match voiceInstance with
+                                | Some voiceInstance when voiceInstance.VoiceChannel.Users.Count < 3 -> 
+                                    async {
+                                        do! voiceInstance.DisposeAsync()
+                                        
+                                        return None
+                                    }
+                                | voiceInstance -> Async.lift voiceInstance
 
-                            do!
-                                staleChannels
-                                |> AsyncSeq.ofSeq
-                                |> AsyncSeq.iterAsyncParallel (fun (_, voiceInstance) ->
-                                    voiceInstance.DisposeAsync()
-                                )
-                        
-                            return! loop (Map.ofList voiceChannels)
+                            return! loop voiceInstance
                     }
 
-                loop Map.empty
+                loop None
             ), cts.Token)
 
     let dispose () =
