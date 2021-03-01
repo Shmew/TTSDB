@@ -1,9 +1,11 @@
 ﻿group DiscordBot
     Discord.Net
     FSharp.Control.AsyncSeq
+    FSharp.Control.Reactive
     FSharp.Core
     FSharp.Json
     Microsoft.CognitiveServices.Speech
+    System.Reactive
     TaskBuilder.fs
     
     // Native libraries

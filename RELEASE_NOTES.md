@@ -1,3 +1,7 @@
+### 0.3.1 - Sunday, February 28th, 2021
+* Fix simultaneous talking crashing the bot
+* Fix messages with mentions not being spoken
+
 ### 0.3.0 - Sunday, February 28th, 2021
 * Allow manual TTS from designated owners
 

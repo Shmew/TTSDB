@@ -6,9 +6,11 @@ group DiscordBot
     
     nuget Discord.Net ~> 2
     nuget FSharp.Control.AsyncSeq ~> 3
+    nuget FSharp.Control.Reactive ~> 5
     nuget FSharp.Core ~> 5
     nuget FSharp.Json ~> 0
     nuget Microsoft.CognitiveServices.Speech ~> 1
+    nuget System.Reactive ~> 5
     nuget TaskBuilder.fs ~> 2
 
     // Native libraries

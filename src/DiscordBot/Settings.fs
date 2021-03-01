@@ -15,6 +15,7 @@ type Settings =
     { GuildId: uint64
       Owners: uint64 list
       TextChannelId: uint64
+      UserMentionedSubstitutions: UserSubstitution list
       UserSubstitutions: UserSubstitution list
       Voice: Voice }
 
@@ -23,6 +24,13 @@ module Settings =
     open FSharp.Json
     open System.IO
     
+    let guildId (settings: Settings) = settings.GuildId
+    let owners (settings: Settings) = settings.Owners
+    let textChannelId (settings: Settings) = settings.TextChannelId
+    let userMentionedSubstitutions (settings: Settings) = settings.UserMentionedSubstitutions
+    let userSubstitutions (settings: Settings) = settings.UserSubstitutions
+    let voice (settings: Settings) = settings.Voice
+
     let get () =
         File.ReadAllText "./settings.json"
         |> Json.deserialize<Settings>

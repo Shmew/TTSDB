@@ -16,9 +16,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Util.fs" />
+    <Compile Include="Extensions.fs" />
+    <Compile Include="MemoryCache.fs" />
     <Compile Include="Settings.fs" />
-    <Compile Include="VoiceOperator.fs" />
     <Compile Include="GuildManager.fs" />
+    <Compile Include="NameManager.fs" />
+    <Compile Include="VoiceOperator.fs" />
     <Compile Include="Main.fs" />
     <None Include="paket.references" />
   </ItemGroup>

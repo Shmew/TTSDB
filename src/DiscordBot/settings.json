@@ -2,6 +2,12 @@
   "GuildId": 0,
   "Owners": [ 0 ],
   "TextChannelId": 0,
+  "UserMentionedSubstitutions": [
+    {
+      "Name": "",
+      "Replacement": ""
+    }
+  ],
   "UserSubstitutions": [
     {
       "Name": "",

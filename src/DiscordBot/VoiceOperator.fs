@@ -3,11 +3,14 @@
 open Discord.Audio
 open Discord.WebSocket
 open FSharp.Control
+open FSharp.Control.Reactive
 open FSharp.Control.Tasks.V2.ContextInsensitive
 open Microsoft.CognitiveServices.Speech
 open System
 open System.IO
+open System.Reactive
 open System.Threading.Tasks
+open TTSDB.MemoryCache
 
 [<RequireQualifiedAccess>]
 module VoiceOperator =
@@ -37,19 +40,20 @@ type VoiceInstance =
     static member DisposeAsync (voiceInstance: VoiceInstance) =
         voiceInstance.DisposeAsync()
 
-type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
+type VoiceOperator (guildManager: GuildManager, ?settings: Settings) =
     let cts = new Threading.CancellationTokenSource()
 
-    let subMap = Option.defaultValue Map.empty subMap
-    
+    let nameManager = NameManager(guildManager, ?settings = settings)
+
     let voice =
-        Option.defaultValue 
+        settings
+        |> Option.map Settings.voice
+        |> Option.defaultValue 
             { Pitch = -60
               Rate = -60
               Style = "cheerful"
               Voice = "en-US-AriaNeural"
               Volume = 100 } 
-            voice
 
     let synthesizer =
         let apiKey = getEnvFromAllOrNone "TTSDB_Azure" |> Option.defaultValue ""
@@ -60,29 +64,54 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
 
         new SpeechSynthesizer(speechConfig, null)
 
-    let createSSML (user: string) (content: string) (isOwnerMsg: bool) =
-        let user =
-            if isOwnerMsg then ""
-            else user
-
-        let content =
-            if isOwnerMsg then content
-            else
-                if content.ToLower().StartsWith("http://") || content.ToLower().StartsWith("https://") then
-                    "posted a link"
-                else sprintf "says, %s" content
-
-        sprintf """
+    let createSSML (content: string) =
+        async {
+            return
+                sprintf """
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
     <voice name="%s">
         <mstts:express-as style="%s">
             <prosody rate="%i%%" pitch="%i%%">
-                %s %s
+                %s
             </prosody>
         </mstts:express-as>
     </voice>
 </speak>
-        """ voice.Voice voice.Style voice.Rate voice.Pitch user content
+                """ voice.Voice voice.Style voice.Rate voice.Pitch content
+        }
+    
+    let createUserSSML (msg: SocketUserMessage) =
+        async {
+            let author =
+                nameManager.TryFindSub msg.Author.Username
+                |> Option.defaultValue msg.Author.Username
+
+            let! content =
+                if msg.Content.ToLower().Contains("http://") || msg.Content.ToLower().Contains("https://") then
+                    Async.lift "posted a link"
+                else
+                    let content = sprintf "says, %s" msg.Content
+
+                    if msg.MentionedUsers.Count = 0 then 
+                        Async.lift content
+                    else 
+                        msg.MentionedUsers 
+                        |> Seq.cast
+                        |> AsyncSeq.ofSeq
+                        |> AsyncSeq.foldAsync (fun content (user: SocketUser) ->
+                            nameManager.FindMentionSub user
+                            |> Async.map (fun name ->
+                                content.Replace(sprintf "<@!%i>" user.Id, name)
+                            )
+                        ) content
+
+            return!
+                sprintf "%s %s" author content
+                |> fun res ->
+                    printfn "Saying: %s" res
+                    res
+                |> createSSML
+        }
 
     let setVolume (volume: int) (audio: byte []) =
         if volume >= 100 || Array.isEmpty audio || audio.Length % 2 <> 0 then audio
@@ -99,29 +128,21 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                 |> BitConverter.GetBytes
             )
 
-    let speakInChannel (discord: AudioOutStream) (msg: SocketUserMessage) (isOwnerMsg: bool) =
-        task {
+    let speakInChannel (discord: AudioOutStream) (getSsml: Async<string>) =
+        async {
             let! audioRaw =
-                task {
-                    let! res =
-                        let author =
-                            subMap.TryFind msg.Author.Username
-                            |> Option.defaultValue msg.Author.Username
-
-                        createSSML author msg.Content isOwnerMsg
-                        |> synthesizer.SpeakSsmlAsync
-
-                    return res.AudioData |> setVolume voice.Volume
-                }
+                getSsml
+                |> Async.bind (synthesizer.SpeakSsmlAsync >> Async.AwaitTask)
+                |> Async.map (fun res -> res.AudioData |> setVolume voice.Volume)
 
             use audioStream = new MemoryStream(audioRaw)
 
-            try 
-                do! audioStream.CopyToAsync(discord)
-            with _ -> ()
+            return! audioStream.CopyToAsync(discord) |> Async.AwaitTask
         }
-        |> Async.AwaitTask
-        |> Async.Start
+        |> Async.protect
+        |> Async.Ignore
+
+    let messageQueue = new Subjects.Subject<AudioOutStream * SocketUserMessage * bool>()
 
     let mailbox = 
         MailboxProcessor<VoiceOperator.Msg>.Start (
@@ -134,7 +155,7 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                         | VoiceOperator.Msg.SpeakIn (channel, msg, isOwnerMsg) ->
                             match Map.tryFind channel.Id voiceChannels with
                             | Some voiceInstance ->
-                                speakInChannel voiceInstance.PCMStream msg isOwnerMsg
+                                messageQueue.OnNext(voiceInstance.PCMStream, msg, isOwnerMsg)
 
                                 return! loop voiceChannels
                             | None -> 
@@ -145,7 +166,7 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                                       PCMStream = ac.CreatePCMStream(AudioApplication.Mixed)
                                       VoiceChannel = channel }
 
-                                speakInChannel voiceInstance.PCMStream msg isOwnerMsg
+                                messageQueue.OnNext(voiceInstance.PCMStream, msg, isOwnerMsg)
 
                                 return! loop (voiceChannels |> Map.add channel.Id voiceInstance)
                         | VoiceOperator.Msg.Dispose replyChannel ->
@@ -179,10 +200,19 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
 
                 loop Map.empty
             ), cts.Token)
+
     do
         AsyncSeq.intervalMs 30000
         |> AsyncSeq.distinctUntilChanged
         |> AsyncSeq.iter (fun _ -> mailbox.Post VoiceOperator.Msg.LeaveEmptyChannels)
+        |> fun a -> Async.Start(a, cts.Token)
+
+        AsyncSeq.ofObservableBuffered messageQueue
+        |> AsyncSeq.iterAsync (fun (pcmStream, msg, isOwnerMsg) -> 
+            if isOwnerMsg then createSSML msg.Content
+            else createUserSSML msg
+            |> speakInChannel pcmStream
+        )
         |> fun a -> Async.Start(a, cts.Token)
 
     member _.WriteTTS (channel: SocketVoiceChannel) (msg: SocketUserMessage) (isOwnerMsg: bool) =

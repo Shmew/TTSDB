@@ -2,6 +2,8 @@
 
 open Discord.WebSocket
 open FSharp.Control
+open System
+open TTSDB.MemoryCache
 
 [<RequireQualifiedAccess>]
 module GuildManager =
@@ -39,3 +41,8 @@ type GuildManager (client: DiscordSocketClient, guildId: uint64) =
     member _.GetGuild () =
         mailbox.PostAndAsyncReply GuildManager.Msg.GetGuild
         |> Async.StartAsTask
+
+    member this.GetGuildAsync () =
+        this.GetGuild() |> Async.AwaitTask
+
+    member val GuildId : uint64 = guildId

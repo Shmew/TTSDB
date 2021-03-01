@@ -12,12 +12,6 @@ module Main =
         task {
             return Console.WriteLine(msg.ToString())
         } :> Task
-        
-    type SocketGuild with
-         member this.TryFindUser (user: SocketUser) =
-            this.Users
-            |> Seq.cast
-            |> Seq.tryFind (fun (gu: SocketGuildUser) -> gu.Id = user.Id)
 
     let startBot () =
         task {
@@ -33,7 +27,7 @@ module Main =
             do! client.StartAsync()
             
             let guildManager = GuildManager(client, settings.GuildId)
-            use voiceOperator = new VoiceOperator(Settings.buildSubMap settings.UserSubstitutions, settings.Voice)
+            use voiceOperator = new VoiceOperator(guildManager, settings)
 
             client.add_Ready(Func<Task>(fun () -> client.SetGameAsync("with kittens", ``type`` = ActivityType.Playing)))
 
@@ -44,7 +38,7 @@ module Main =
                     && isNull msg.Content |> not 
                     && not msg.Author.IsBot 
                     && not msg.Author.IsWebhook ->
-                    
+
                     task {
                         let! guild = guildManager.GetGuild()
 
@@ -54,21 +48,24 @@ module Main =
                                 voiceOperator.WriteTTS user.VoiceChannel msg false
                             | _ -> Task.FromResult() :> Task
                     } :> Task
-                | :? SocketUserMessage as msg when 
+                | :? SocketUserMessage as msg when
                     List.contains msg.Author.Id settings.Owners
                     && isNull msg.Content |> not 
                     && not msg.Author.IsBot 
                     && not msg.Author.IsWebhook ->
                     
-                    task {
-                        let! guild = guildManager.GetGuild()
+                    match msg.Channel with
+                    | :? SocketDMChannel ->
+                        task {
+                            let! guild = guildManager.GetGuild()
 
-                        return!
-                            match guild.TryFindUser(msg.Author) with
-                            | Some user when isNull user.VoiceChannel |> not ->
-                                voiceOperator.WriteTTS user.VoiceChannel msg true
-                            | _ -> Task.FromResult() :> Task
-                    } :> Task
+                            return!
+                                match guild.TryFindUser(msg.Author) with
+                                | Some user when isNull user.VoiceChannel |> not ->
+                                    voiceOperator.WriteTTS user.VoiceChannel msg true
+                                | _ -> Task.FromResult() :> Task
+                        } :> Task
+                    | _ -> Task.FromResult() :> Task
                 | _ -> Task.FromResult() :> Task
             ))
             
