@@ -51,7 +51,22 @@ module Main =
                         return!
                             match guild.TryFindUser(msg.Author) with
                             | Some user when isNull user.VoiceChannel |> not ->
-                                voiceOperator.WriteTTS user.VoiceChannel msg
+                                voiceOperator.WriteTTS user.VoiceChannel msg false
+                            | _ -> Task.FromResult() :> Task
+                    } :> Task
+                | :? SocketUserMessage as msg when 
+                    List.contains msg.Author.Id settings.Owners
+                    && isNull msg.Content |> not 
+                    && not msg.Author.IsBot 
+                    && not msg.Author.IsWebhook ->
+                    
+                    task {
+                        let! guild = guildManager.GetGuild()
+
+                        return!
+                            match guild.TryFindUser(msg.Author) with
+                            | Some user when isNull user.VoiceChannel |> not ->
+                                voiceOperator.WriteTTS user.VoiceChannel msg true
                             | _ -> Task.FromResult() :> Task
                     } :> Task
                 | _ -> Task.FromResult() :> Task

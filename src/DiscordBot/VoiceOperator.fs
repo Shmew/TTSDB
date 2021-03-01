@@ -12,7 +12,7 @@ open System.Threading.Tasks
 [<RequireQualifiedAccess>]
 module VoiceOperator =
     type Msg =
-        | SpeakIn of channel:SocketVoiceChannel * msg: SocketUserMessage
+        | SpeakIn of channel:SocketVoiceChannel * msg:SocketUserMessage * isOwnerMsg:bool
         | LeaveEmptyChannels
         | Dispose of AsyncReplyChannel<unit>
 
@@ -60,11 +60,17 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
 
         new SpeechSynthesizer(speechConfig, null)
 
-    let createSSML (user: string) (content: string) =
+    let createSSML (user: string) (content: string) (isOwnerMsg: bool) =
+        let user =
+            if isOwnerMsg then ""
+            else user
+
         let content =
-            if content.ToLower().StartsWith("http://") || content.ToLower().StartsWith("https://") then
-                "posted a link"
-            else sprintf "says, %s" content
+            if isOwnerMsg then content
+            else
+                if content.ToLower().StartsWith("http://") || content.ToLower().StartsWith("https://") then
+                    "posted a link"
+                else sprintf "says, %s" content
 
         sprintf """
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
@@ -93,7 +99,7 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                 |> BitConverter.GetBytes
             )
 
-    let speakInChannel (discord: AudioOutStream) (msg: SocketUserMessage) =
+    let speakInChannel (discord: AudioOutStream) (msg: SocketUserMessage) (isOwnerMsg: bool) =
         task {
             let! audioRaw =
                 task {
@@ -102,7 +108,7 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                             subMap.TryFind msg.Author.Username
                             |> Option.defaultValue msg.Author.Username
 
-                        createSSML author msg.Content
+                        createSSML author msg.Content isOwnerMsg
                         |> synthesizer.SpeakSsmlAsync
 
                     return res.AudioData |> setVolume voice.Volume
@@ -125,10 +131,10 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                         let! msg = inbox.Receive()
 
                         match msg with
-                        | VoiceOperator.Msg.SpeakIn (channel, msg) ->
+                        | VoiceOperator.Msg.SpeakIn (channel, msg, isOwnerMsg) ->
                             match Map.tryFind channel.Id voiceChannels with
                             | Some voiceInstance ->
-                                speakInChannel voiceInstance.PCMStream msg
+                                speakInChannel voiceInstance.PCMStream msg isOwnerMsg
 
                                 return! loop voiceChannels
                             | None -> 
@@ -139,7 +145,7 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
                                       PCMStream = ac.CreatePCMStream(AudioApplication.Mixed)
                                       VoiceChannel = channel }
 
-                                speakInChannel voiceInstance.PCMStream msg
+                                speakInChannel voiceInstance.PCMStream msg isOwnerMsg
 
                                 return! loop (voiceChannels |> Map.add channel.Id voiceInstance)
                         | VoiceOperator.Msg.Dispose replyChannel ->
@@ -179,10 +185,10 @@ type VoiceOperator (?subMap: Map<string,string>, ?voice: Voice) =
         |> AsyncSeq.iter (fun _ -> mailbox.Post VoiceOperator.Msg.LeaveEmptyChannels)
         |> fun a -> Async.Start(a, cts.Token)
 
-    member _.WriteTTS (channel: SocketVoiceChannel) (msg: SocketUserMessage) =
+    member _.WriteTTS (channel: SocketVoiceChannel) (msg: SocketUserMessage) (isOwnerMsg: bool) =
         task {
             return
-                VoiceOperator.Msg.SpeakIn(channel, msg)
+                VoiceOperator.Msg.SpeakIn(channel, msg, isOwnerMsg)
                 |> mailbox.Post
         } :> Task
         

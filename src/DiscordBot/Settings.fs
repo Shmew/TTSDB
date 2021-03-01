@@ -13,6 +13,7 @@ type Voice =
 
 type Settings =
     { GuildId: uint64
+      Owners: uint64 list
       TextChannelId: uint64
       UserSubstitutions: UserSubstitution list
       Voice: Voice }

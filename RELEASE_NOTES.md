@@ -1,3 +1,6 @@
+### 0.3.0 - Sunday, February 28th, 2021
+* Allow manual TTS from designated owners
+
 ### 0.2.0 - Sunday, February 28th, 2021
 * Allow voice settings to be changed by settings.json
 
